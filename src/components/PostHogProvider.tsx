@@ -1,16 +1,31 @@
 'use client';
 
 import posthog from 'posthog-js';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const PH_API_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || '/ph-x9a'; // vercel.json에서 만든 프록시 경로
 const PH_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY || '';
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
+function PostHogTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // 2) 라우트 변경 시 페이지뷰 추적
+  useEffect(() => {
+    if (!PH_KEY) return;
+    // 검색파라미터까지 포함해 경로 구성
+    const url = searchParams?.toString()
+      ? `${pathname}?${searchParams.toString()}`
+      : pathname;
+
+    posthog.capture('$pageview', { $current_url: url });
+  }, [pathname, searchParams]);
+
+  return null;
+}
+
+export function PostHogProvider({ children }: { children: React.ReactNode }) {
   // 1) 최초 초기화 (한 번만)
   useEffect(() => {
     if (!PH_KEY) {
@@ -34,16 +49,12 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // 2) 라우트 변경 시 페이지뷰 추적
-  useEffect(() => {
-    if (!PH_KEY) return;
-    // 검색파라미터까지 포함해 경로 구성
-    const url = searchParams?.toString()
-      ? `${pathname}?${searchParams.toString()}`
-      : pathname;
-
-    posthog.capture('$pageview', { $current_url: url });
-  }, [pathname, searchParams]);
-
-  return <>{children}</>;
+  return (
+    <>
+      <Suspense fallback={null}>
+        <PostHogTracker />
+      </Suspense>
+      {children}
+    </>
+  );
 }
