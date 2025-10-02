@@ -9,7 +9,9 @@ import { useEffect } from 'react';
 
 export default function Home() {
   useEffect(() => {
-    posthog.capture('home_page_view');
+    if (typeof window !== 'undefined') {
+      posthog.capture('home_page_view');
+    }
   }, []);
 
   return (

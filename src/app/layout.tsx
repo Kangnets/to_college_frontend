@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import posthog from 'posthog-js';
+import { PostHogProvider } from '@/components/PostHogProvider';
 
 const pretendard = localFont({
   src: '../assets/fonts/PretendardVariable.woff2',
@@ -24,11 +24,6 @@ export const metadata: Metadata = {
   description: '너에게 닿기를 : 단톡 내용으로 확인하는 우리의 대학 라이프',
 };
 
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY || '', {
-  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
-  defaults: '2025-05-24',
-});
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,7 +37,7 @@ export default function RootLayout({
       <body
         className={`${pretendard.className} bg-color-background antialiased`}
       >
-        {children}
+        <PostHogProvider>{children}</PostHogProvider>
       </body>
     </html>
   );
