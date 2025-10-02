@@ -2,17 +2,31 @@
   "rewrites": [
     {
       "source": "/ph-x9a/:path*",
-      "destination": "https://us.i.posthog.com/:path*",
-      "headers": {
-        "Host": "us.i.posthog.com"
-      }
+      "destination": "https://us.i.posthog.com/:path*"
     },
     {
       "source": "/ph-x9a/static/:path*",
-      "destination": "https://us-assets.i.posthog.com/static/:path*",
-      "headers": {
-        "Host": "us-assets.i.posthog.com"
-      }
+      "destination": "https://us-assets.i.posthog.com/static/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/ph-x9a/:path*",
+      "headers": [
+        {
+          "key": "Host",
+          "value": "us.i.posthog.com"
+        }
+      ]
+    },
+    {
+      "source": "/ph-x9a/static/:path*",
+      "headers": [
+        {
+          "key": "Host",
+          "value": "us-assets.i.posthog.com"
+        }
+      ]
     }
   ]
 }
